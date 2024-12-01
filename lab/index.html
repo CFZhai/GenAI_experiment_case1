@@ -14,7 +14,7 @@
       const paramsObj = {};
       if (!queryString) return paramsObj;
       const pairs = queryString.split('&');
-      pairs.forEach(pair => {
+      pairs.forEach((pair) => {
         const [key, value] = pair.split('=').map(decodeURIComponent);
         if (paramsObj.hasOwnProperty(key)) {
           if (Array.isArray(paramsObj[key])) {
@@ -27,7 +27,7 @@
         }
       });
       return paramsObj;
-    }
+    };
 
     async function ajaxFetch(options) {
       const defaults = {
@@ -37,7 +37,7 @@
         headers: {},
         responseType: 'json',
         success: function () { },
-        error: function () { }
+        error: function () { },
       };
 
       options = Object.assign({}, defaults, options);
@@ -46,11 +46,13 @@
         const config = {
           method: options.method,
           headers: options.headers,
-          body: options.method === 'POST' && options.data ? JSON.stringify(options.data) : null
+          body:
+            options.method === 'POST' && options.data
+              ? JSON.stringify(options.data)
+              : null,
         };
 
         const response = await fetch(options.url, config);
-
 
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
@@ -64,16 +66,16 @@
         }
 
         options.success(responseData, response.status, response);
-
       } catch (error) {
         options.error(error.message, error.status || 0, error);
       }
     }
 
     const logs = (record_json) => {
+      const { task_uuid, task_round, token } = qs();
       ajaxFetch({
-        method: "POST",
-        url: "https://llmapi.chaofanzhai.com/v1/task_logs",
+        method: 'POST',
+        url: 'https://llmapi.chaofanzhai.com/v1/task_logs',
         headers: {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
@@ -81,39 +83,44 @@
         data: {
           task_uuid,
           task_round,
-          record_json
-        }
-      })
-    }
+          record_json,
+        },
+      });
+    };
 
-    debugger
+    debugger;
 
     const fn = function (event) {
-
       event.preventDefault();
       let text = event.clipboardData.getData('text');
       const match = text.match(/^[A-Z_]+:\s*/);
       logs({ type: `PASTE_${match || 'OTHER'}`, content: text });
       text = match ? text.replace(match.toString(), '') : text;
       document.execCommand('insertText', false, text);
-
     };
 
     window.addEventListener('paste', fn);
 
-    document.addEventListener("click", (e) => {
-      const dom = e.target;
-      if (dom.tagName === "JP-BUTTON" && dom.parentElement.getAttribute("data-jp-item-name") === "run") {
-        const { task_uuid, task_round, token } = qs()
-        document.querySelectorAll(".jp-WindowedPanel-outer").forEach(el => {
-          logs({
-            type: "CODE_RUN",
-            codeContent: el.innerHTML
-          })
-
-        })
-      }
-    }, true)
+    document.addEventListener(
+      'click',
+      (e) => {
+        const dom = e.target;
+        if (
+          dom.tagName === 'JP-BUTTON' &&
+          dom.parentElement.getAttribute('data-jp-item-name') === 'run'
+        ) {
+          document
+            .querySelectorAll('.jp-WindowedPanel-outer')
+            .forEach((el) => {
+              logs({
+                type: 'CODE_RUN',
+                codeContent: el.innerHTML,
+              });
+            });
+        }
+      },
+      true
+    );
   </script>
   <style>
     #jp-menu-panel {
@@ -124,16 +131,14 @@
       {}
     </script>
   <script>
-      (async function () {
-        const { pathname, origin, search, hash } = window.location;
-        if (pathname.match(/(index.html|\/?)$/) == null) {
-          window.location.href = `${origin}${pathname}/${search}${hash}`;
-          return;
-        }
-        await import(
-          '../config-utils.js'
-        );
-      }.call(this));
+    (async function () {
+      const { pathname, origin, search, hash } = window.location;
+      if (pathname.match(/(index.html|\/?)$/) == null) {
+        window.location.href = `${origin}${pathname}/${search}${hash}`;
+        return;
+      }
+      await import('../config-utils.js');
+    }).call(this);
   </script>
 </head>
 
