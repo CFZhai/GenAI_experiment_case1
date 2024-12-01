@@ -88,18 +88,12 @@
       });
     };
 
-    debugger;
-
-    const fn = function (event) {
-      event.preventDefault();
+    window.addEventListener('paste', (event) => {
       let text = event.clipboardData.getData('text');
       const match = text.match(/^[A-Z_]+:\s*/);
-      logs({ type: `PASTE_${match || 'OTHER'}`, content: text });
       text = match ? text.replace(match.toString(), '') : text;
-      document.execCommand('insertText', false, text);
-    };
-
-    window.addEventListener('paste', fn);
+      logs({ type: `PASTE_${match || 'OTHER'}`, content: text });
+    });
 
     document.addEventListener(
       'click',
