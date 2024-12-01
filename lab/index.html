@@ -70,21 +70,17 @@
       }
     }
 
-
-
-
-
     document.addEventListener("click", (e) => {
       const dom = e.target;
       if (dom.tagName === "JP-BUTTON" && dom.parentElement.getAttribute("data-jp-item-name") === "run") {
-        const { task_uuid, task_round } = qs()
+        const { task_uuid, task_round, token } = qs()
         document.querySelectorAll(".jp-WindowedPanel-outer").forEach(el => {
-          console.log(el.innerHTML, "code的内容")
           ajaxFetch({
             method: "POST",
             url: "https://llmapi.chaofanzhai.com/v1/task_logs",
             headers: {
-              'Content-Type': 'application/json'
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json',
             },
             data: {
               task_uuid,
