@@ -70,26 +70,46 @@
       }
     }
 
+    const logs = (record_json) => {
+      ajaxFetch({
+        method: "POST",
+        url: "https://llmapi.chaofanzhai.com/v1/task_logs",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        data: {
+          task_uuid,
+          task_round,
+          record_json
+        }
+      })
+    }
+
+    const fn = function (event) {
+      let text = event.clipboardData.getData('text');
+      const match = text.match(/^[A-Z_]+:\s*/);
+
+      text = match ? text.replace(match.toString(), '') : text;
+
+      event.preventDefault();
+
+      event.target.value = text;
+      logs({ type: `PASTE_${match || 'OTHER'}`, content: text });
+    };
+
+    window.addEventListener('paste', fn);
+
     document.addEventListener("click", (e) => {
       const dom = e.target;
       if (dom.tagName === "JP-BUTTON" && dom.parentElement.getAttribute("data-jp-item-name") === "run") {
         const { task_uuid, task_round, token } = qs()
         document.querySelectorAll(".jp-WindowedPanel-outer").forEach(el => {
-          ajaxFetch({
-            method: "POST",
-            url: "https://llmapi.chaofanzhai.com/v1/task_logs",
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-            data: {
-              task_uuid,
-              task_round,
-              record_json: {
-                codeContent: el.innerHTML
-              }
-            }
+          logs({
+            type: "CODE_RUN",
+            codeContent: el.innerHTML
           })
+
         })
       }
     }, true)
