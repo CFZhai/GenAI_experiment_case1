@@ -86,15 +86,15 @@
       })
     }
 
+    debugger
+
     const fn = function (event) {
+      debugger;
+      event.preventDefault();
       let text = event.clipboardData.getData('text');
       const match = text.match(/^[A-Z_]+:\s*/);
-
       text = match ? text.replace(match.toString(), '') : text;
-
-      event.preventDefault();
-
-      event.target.value = text;
+      document.execCommand('insertText', false, modifiedText);
       logs({ type: `PASTE_${match || 'OTHER'}`, content: text });
     };
 
